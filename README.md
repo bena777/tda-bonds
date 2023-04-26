@@ -1,0 +1,3 @@
+A quick, accessible way to access data on bond prices/returns. I made this project due to being annoyed with how complicated it 
+is to view TDA bond prices and stats so I hoped to provide an easy solution to the issue. Unfortunately, at the current time, this program will 
+only work as intended with a TDA dev key in order to access the data from your local machine. ![Screenshot 2023-04-25 225444.png](..%2F..%2FDesktop%2FScreenshot%202023-04-25%20225444.png)

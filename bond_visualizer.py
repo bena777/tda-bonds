@@ -160,7 +160,7 @@ class Ui_BondVisualizer(object):
                     interpolated_prices = np.interp(interpolated_times,[0,self.dtm.days],[self.price,self.fv])
                     curve = PlotCurveItem(interpolated_times,interpolated_prices)
                     self.bond_chart.addItem(curve)
-                    self.bond_chart.getAxis("bottom").setLabel(text="Days Until Maturity")
+                    self.bond_chart.getAxis("bottom").setLabel(text="Days Passed")
                     self.bond_chart.getAxis("left").setLabel(text="Bond Price")
                 else:
                     self.raw_return = ((((self.fv-self.price)/100))+((float(self.coupon[0])/100)*(self.dtm.days/365)))*100
@@ -188,7 +188,7 @@ class Ui_BondVisualizer(object):
 " Days Till Maturity: "))
         self.cusip_label.setText(_translate("BondVisualizer", "CUSIP:"))
         self.ack_label.setText(_translate("BondVisualizer", "Created by Ben A using TDA data \n *Chart does NOT work unless bond is 0 coupon"))
-        self.cusip_input.setText(_translate("BondVisualizer","10421AAA5"))
+        self.cusip_input.setText(_translate("BondVisualizer",""))
 
 
 if __name__ == "__main__":

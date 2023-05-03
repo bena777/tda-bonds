@@ -1,7 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from main import tda_auth
-import re
-from datetime import date
+from bond import Bond
 from pyqtgraph import PlotWidget, PlotCurveItem
 import numpy as np
 
@@ -10,10 +8,6 @@ import numpy as np
 # All returns are calculated assuming the bond is held until maturity
 # Linear model graph is only used for 0 coupon bonds since this it does not work with coupon based assets
 # Created by Ben A, 2023
-
-
-c = tda_auth()
-
 
 class Ui_BondVisualizer(object):
     def setupUi(self, BondVisualizer):
@@ -139,34 +133,22 @@ class Ui_BondVisualizer(object):
         self.retranslateUi(BondVisualizer)
         def get_data():
             self.cusip = self.cusip_input.text()
-            c = tda_auth()
             try:
-                bond = c.get_instrument(self.cusip)
-                self.bond_label.setText(bond.json()[0]['description'])
-                self.price = bond.json()[0]['bondPrice'].__round__(5)
-                self.price_output.setText(str(self.price))
-                self.fv=100
-                self.fv_label.setText("100")
-                self.coupon = re.findall(r'\d+\.\d+|\d+',self.bond_label.text())
-                self.coupon_label.setText(self.coupon[0]+"%")
-                self.dtm = date(int(self.coupon[1]),int(self.coupon[2]),int(self.coupon[3]))-date.today()
-                self.dtm_label.setText(str(self.dtm.days))
-                if float(self.coupon[0])==0:
-                    self.raw_return = (((self.fv-self.price)/100)*100).__round__(4)
-                    self.return_label.setText(str(self.raw_return)+"%")
-                    self.ann_return = (((1 + (self.raw_return / 100)) ** (365 /self.dtm.days))-1)*100
-                    self.anr_label.setText(str(self.ann_return.__round__(4))+"%")
-                    interpolated_times = np.linspace(0,self.dtm.days,100)
-                    interpolated_prices = np.interp(interpolated_times,[0,self.dtm.days],[self.price,self.fv])
-                    curve = PlotCurveItem(interpolated_times,interpolated_prices)
+                bond = Bond(self.cusip)
+                self.bond_label.setText(bond.get_description())
+                self.price_output.setText(str(bond.get_price()))
+                self.fv_label.setText(str(bond.get_fv()))
+                self.coupon_label.setText(bond.get_coupon()[0])
+                self.dtm_label.setText(str(bond.get_dtm()))
+                self.return_label.setText(str(bond.get_raw_return().__round__(4))+"%")
+                self.anr_label.setText(str(bond.get_ann_return().__round__(4))+"%")
+                if float(bond.get_coupon()[0])==0:
+                    interpolated_times = np.linspace(0, bond.get_dtm(), 100)
+                    interpolated_prices = np.interp(interpolated_times, [0, bond.get_dtm()],[bond.get_price(), bond.get_fv()])
+                    curve = PlotCurveItem(interpolated_times, interpolated_prices)
                     self.bond_chart.addItem(curve)
                     self.bond_chart.getAxis("bottom").setLabel(text="Days Passed")
                     self.bond_chart.getAxis("left").setLabel(text="Bond Price")
-                else:
-                    self.raw_return = ((((self.fv-self.price)/100))+((float(self.coupon[0])/100)*(self.dtm.days/365)))*100
-                    self.return_label.setText(str(self.raw_return.__round__(5))+"%")
-                    self.ann_return = (((1 + (self.raw_return / 100)) ** (365 /self.dtm.days))-1).__round__(5)*100
-                    self.anr_label.setText(str(self.ann_return)+"%")
             except:
                 self.bond_label.setText("Invalid input.")
         QtCore.QMetaObject.connectSlotsByName(BondVisualizer)
